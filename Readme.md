@@ -10,11 +10,7 @@ Une application interactive de questions à choix multiples (QCM) conçue pour t
 - 🎯 **Catégories multiples** : Organisés par thèmes
 
 ## Installation
-```bash
-git clone <repository-url>
-cd projet\ QCM\ tech
-npm install
-```
+à vous de chercher je suis pas votre servant 
 
 ## Usage
 ```bash
