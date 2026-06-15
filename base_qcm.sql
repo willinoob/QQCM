@@ -12,8 +12,34 @@ CREATE TABLE utilisateurs (
   prenom VARCHAR(50) NOT NULL,
   email VARCHAR(50) NOT NULL,
   mot_de_passe VARCHAR(50) NOT NULL,
-  role ENUM('admin','user') NOT NULL default 'user',
+  role enum('admin','user') NOT NULL default 'user',
+  status TEXT NOT NULL,
   CONSTRAINT utilisateurs_PK PRIMARY KEY (id_user)
+)ENGINE=InnoDB;
+
+
+-- ----------------------------
+-- Table: categories
+-- ----------------------------
+CREATE TABLE categories (
+  id_categorie INT NOT NULL,
+  CONSTRAINT categories_PK PRIMARY KEY (id_categorie)
+)ENGINE=InnoDB;
+
+
+-- ----------------------------
+-- Table: tentatives
+-- ----------------------------
+CREATE TABLE tentatives (
+  id_t INT NOT NULL,
+  score FLOAT NOT NULL,
+  date DATETIME NOT NULL,
+  temps_ecoule INT NOT NULL,
+  etat_tentative TEXT NOT NULL,
+  status TEXT NOT NULL,
+  id_user INT NOT NULL,
+  CONSTRAINT tentatives_PK PRIMARY KEY (id_t),
+  CONSTRAINT tentatives_id_user_FK FOREIGN KEY (id_user) REFERENCES utilisateurs (id_user)
 )ENGINE=InnoDB;
 
 
@@ -28,20 +54,9 @@ CREATE TABLE Questions (
   reponse3 VARCHAR(50) NOT NULL,
   reponse4 VARCHAR(50) NOT NULL,
   bonne_reponse INT NOT NULL,
-  CONSTRAINT Questions_PK PRIMARY KEY (id_q)
-)ENGINE=InnoDB;
-
-
--- ----------------------------
--- Table: tentatives
--- ----------------------------
-CREATE TABLE tentatives (
-  id_t INT NOT NULL,
-  score FLOAT NOT NULL,
-  date DATETIME NOT NULL,
-  id_user INT NOT NULL,
-  CONSTRAINT tentatives_PK PRIMARY KEY (id_t),
-  CONSTRAINT tentatives_id_user_FK FOREIGN KEY (id_user) REFERENCES utilisateurs (id_user)
+  id_categorie INT NOT NULL,
+  CONSTRAINT Questions_PK PRIMARY KEY (id_q),
+  CONSTRAINT Questions_id_categorie_FK FOREIGN KEY (id_categorie) REFERENCES categories (id_categorie)
 )ENGINE=InnoDB;
 
 
@@ -51,7 +66,6 @@ CREATE TABLE tentatives (
 CREATE TABLE reponses (
   id_rep INT NOT NULL,
   reponse_user INT NOT NULL,
-  correcte TINYINT(1) NOT NULL,
   id_q INT NOT NULL,
   id_t INT NOT NULL,
   CONSTRAINT reponses_PK PRIMARY KEY (id_rep),
