@@ -2,7 +2,12 @@
 session_start();
 require "db.php";
 
-$id_user = 1; // session utilisateur plus tard
+// sécurité : vérifier login
+if (!isset($_SESSION['id_user'])) {
+    die("Utilisateur non connecté");
+}
+
+$id_user = $_SESSION['id_user'];
 
 // création tentative
 $conn->query("
@@ -12,16 +17,16 @@ $conn->query("
 
 $id_t = $conn->insert_id;
 
-// 10 questions aléatoires
-$res = $conn->query("
-    SELECT * 
-    FROM Questions 
-    ORDER BY RAND() 
+// questions
+$result = $conn->query("
+    SELECT * FROM Questions
+    ORDER BY RAND()
     LIMIT 10
 ");
 
 $questions = [];
-while ($row = $res->fetch_assoc()) {
+
+while ($row = $result->fetch_assoc()) {
     $questions[] = $row;
 }
 
