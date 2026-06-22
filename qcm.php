@@ -10,7 +10,16 @@ $index = $_SESSION['index'];
 $question = $_SESSION['qcm'][$index];
 ?>
 
-<h2>Question <?= $index + 1 ?>/10</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h2>Question <?= $index + 1 ?>/10</h2>
 
 <form method="POST" action="traitement.php">
     <p><?= htmlspecialchars($question['question']) ?></p>
@@ -22,3 +31,5 @@ $question = $_SESSION['qcm'][$index];
 
     <button type="submit">Valider</button>
 </form>
+</body>
+</html>
