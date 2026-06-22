@@ -2,8 +2,8 @@
 -- Script MYSQL pour mcd 
 -- ----------------------------------------------------------
 
-cREATE DATABASE IF NOT EXISTS QQCM;
-uSE QQCM;
+CREATE DATABASE IF NOT EXISTS QQCM;
+USE QQCM;
 -- ----------------------------
 -- Table: utilisateurs
 -- ----------------------------
