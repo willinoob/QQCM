@@ -1,13 +1,13 @@
 <?php
 session_start();
 // Connexion MySQLi (adaptez les paramètres si besoin)
-$id = mysqli_connect("localhost", "root", "root", "qcm");
+$id = mysqli_connect("localhost", "root", "root", "QQCM");
 if (!$id) {
 	die('DB connection failed: ' . mysqli_connect_error());
 }
 
 // Tirer 10 questions aléatoires
-$res = mysqli_query($id, "SELECT * FROM questions ORDER BY RAND() LIMIT 10");
+$res = mysqli_query($id, "SELECT * FROM Questions ORDER BY RAND() LIMIT 10");
 if (!$res) {
 	die('Query error: ' . mysqli_error($id));
 }
