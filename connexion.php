@@ -8,20 +8,23 @@ $connect = mysqli_connect('localhost', 'root', '', 'qqcm');
 if (!$connect) {
     die("Erreur de connexion : " . mysqli_connect_error());
 }
+
+mysqli_set_charset($connect, 'utf8mb4');
+
 if (isset($_POST['connexion'])) {
     // --- Vérification du honeypot ---
     if (!empty($_POST['url'])) {
         exit();
     }
-    // On récupère l'email pour pouvoir le réafficher dans le formulaire en cas d'erreur
+
     $email = trim($_POST['email'] ?? '');
     $mdp   = $_POST['mdp'] ?? '';
 
     if ($email === '' || $mdp === '') {
         $erreur = 'Email ou mot de passe incorrect.';
     } else {
-        // Requête préparée : protège contre l'injection SQL
-        $sql = 'SELECT id_user, nom, prenom, mot_de_passe FROM utilisateurs WHERE email = ? LIMIT 1';
+        // On récupère aussi role et status, nécessaires pour les vérifications après le mot de passe
+        $sql = 'SELECT id_user, nom, prenom, mot_de_passe, role, status FROM utilisateurs WHERE email = ? LIMIT 1';
         $stmt = mysqli_prepare($connect, $sql);
 
         if ($stmt === false) {
@@ -34,17 +37,27 @@ if (isset($_POST['connexion'])) {
             mysqli_stmt_close($stmt);
 
             if ($user && password_verify($mdp, $user['mot_de_passe'])) {
-                session_regenerate_id(true);
-                $_SESSION['id_user'] = (int) $user['id_user'];
-                $_SESSION['prenom']  = $user['prenom'];
-                $_SESSION['nom']     = $user['nom'];
 
-                header('Location: acceuil.php');
-                exit();
+                // Le mot de passe est correct : MAINTENANT on vérifie si le compte est actif.
+                // On ne fait cette vérification qu'après le mot de passe, pour ne jamais révéler
+                // l'état d'un compte à quelqu'un qui n'a même pas le bon mot de passe.
+                if ($user['status'] !== 'actif') {
+                    $erreur = 'Votre compte a été bloqué. Contactez un administrateur.';
+                } else {
+                    session_regenerate_id(true);
+                    $_SESSION['id_user'] = (int) $user['id_user'];
+                    $_SESSION['prenom']  = $user['prenom'];
+                    $_SESSION['nom']     = $user['nom'];
+                    $_SESSION['role']    = $user['role'];
+
+                    header('Location: acceuil.php');
+                    exit();
+                }
+            } else {
+                // Message volontairement générique : on ne dit jamais
+                // si c'est l'email OU le mot de passe qui est faux
+                $erreur = 'Email ou mot de passe incorrect.';
             }
-            // Message volontairement générique : on ne dit jamais
-            // si c'est l'email OU le mot de passe qui est faux
-            $erreur = 'Email ou mot de passe incorrect.';
         }
     }
 }
@@ -81,7 +94,7 @@ mysqli_close($connect);
                 <input type="text" name="url" tabindex="-1" autocomplete="off">
             </div>
             <div class="form-submit">
-                <button type="submit" name="connexion" class="btn-submit">Je me connecte</button></button>
+                <button type="submit" name="connexion" class="btn-submit">Je me connecte</button>
             </div>
         </form>
         <p class="lien">Pas de compte ? <a href="inscription_user.php">S'inscrire</a></p>

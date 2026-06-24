@@ -8,10 +8,11 @@ if (!$connect) {
     die("Erreur de connexion : " . mysqli_connect_error());
 }
 
+mysqli_set_charset($connect, 'utf8mb4');
+
 if (isset($_POST['submit'])) {
 
     if (!empty($_POST['url'])) {
-       
         exit();
     }
 
@@ -63,9 +64,17 @@ if (isset($_POST['submit'])) {
 
     if (empty($erreurs)) {
         $mdp_hache = password_hash($mdp, PASSWORD_DEFAULT);
-        $requete_insert = mysqli_prepare($connect, "INSERT INTO utilisateurs(nom, prenom, email, mot_de_passe) VALUES (?, ?, ?, ?)");
-        mysqli_stmt_bind_param($requete_insert, "ssss", $nom, $prenom, $email, $mdp_hache);
+
+        // Valeurs fixées par le serveur, jamais par le formulaire :
+        // un utilisateur qui s'inscrit lui-même est toujours "user" et "actif" par défaut.
+        $role_par_defaut = 'user';
+        $status_par_defaut = 'actif';
+
+        $requete_insert = mysqli_prepare($connect,
+            "INSERT INTO utilisateurs(nom, prenom, email, mot_de_passe, role, status) VALUES (?, ?, ?, ?, ?, ?)");
+        mysqli_stmt_bind_param($requete_insert, "ssssss", $nom, $prenom, $email, $mdp_hache, $role_par_defaut, $status_par_defaut);
         mysqli_stmt_execute($requete_insert);
+        mysqli_stmt_close($requete_insert);
 
         header('Location: connexion.php');
         exit();
