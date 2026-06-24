@@ -1,27 +1,28 @@
 <?php
 session_start();
 
-$redirect = $_GET['redirect'] ?? $_POST['redirect'] ?? '';
-$id_anno_redirect = isset($_GET['id_anno']) ? (int) $_GET['id_anno'] : (int) ($_POST['id_anno'] ?? 0);
-
-$conn = mysqli_connect('localhost', 'root', '', 'bd_blogmoteur');
 $erreur = null;
+$email = '';
 
-if (!$conn) {
-    $erreur = 'Impossible de se connecter à la base de données.';
+$connect = mysqli_connect('localhost', 'root', '', 'qqcm');
+if (!$connect) {
+    die("Erreur de connexion : " . mysqli_connect_error());
 }
-
-if ($conn && isset($_POST['connexion'])) {
-
+if (isset($_POST['connexion'])) {
+    // --- Vérification du honeypot ---
+    if (!empty($_POST['url'])) {
+        exit();
+    }
+    // On récupère l'email pour pouvoir le réafficher dans le formulaire en cas d'erreur
     $email = trim($_POST['email'] ?? '');
     $mdp   = $_POST['mdp'] ?? '';
 
     if ($email === '' || $mdp === '') {
         $erreur = 'Email ou mot de passe incorrect.';
     } else {
-        // Requête préparée : l'email n'est jamais collé dans la chaîne SQL (anti-injection)
-        $sql = 'SELECT id_user, nom, prenom, password FROM users WHERE email = ? LIMIT 1';
-        $stmt = mysqli_prepare($conn, $sql);
+        // Requête préparée : protège contre l'injection SQL
+        $sql = 'SELECT id_user, nom, prenom, mot_de_passe FROM utilisateurs WHERE email = ? LIMIT 1';
+        $stmt = mysqli_prepare($connect, $sql);
 
         if ($stmt === false) {
             $erreur = 'Erreur technique. Veuillez réessayer.';
@@ -32,63 +33,58 @@ if ($conn && isset($_POST['connexion'])) {
             $user = mysqli_fetch_assoc($resultat);
             mysqli_stmt_close($stmt);
 
-            // password_verify : compare le mdp saisi au hash stocké en base
-            if ($user && password_verify($mdp, $user['password'])) {
+            if ($user && password_verify($mdp, $user['mot_de_passe'])) {
+                session_regenerate_id(true);
                 $_SESSION['id_user'] = (int) $user['id_user'];
                 $_SESSION['prenom']  = $user['prenom'];
                 $_SESSION['nom']     = $user['nom'];
 
-                if ($redirect === 'messages' && $id_anno_redirect > 0) {
-                    header('Location: messages.php?id_anno=' . $id_anno_redirect);
-                } else {
-                    header('Location: page_annonces.php');
-                }
-                exit;
+                header('Location: acceuil.php');
+                exit();
             }
-
+            // Message volontairement générique : on ne dit jamais
+            // si c'est l'email OU le mot de passe qui est faux
             $erreur = 'Email ou mot de passe incorrect.';
         }
     }
 }
 
-if ($conn) {
-    mysqli_close($conn);
-}
+mysqli_close($connect);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion — Le Blog Moteur</title>
-    <link rel="stylesheet" href="assets/css/site.css">
+    <title>Connexion</title>
+    <link rel="stylesheet" href="connexion_css.css">
 </head>
 <body class="page-connexion">
 
     <div class="box">
 
-        <h1>leblog<span class="brand-accent">moteur</span></h1>
-        <hr>
-
-        <form action="" method="post">
-
-            <?php if ($redirect === 'messages' && $id_anno_redirect > 0): ?>
-                <input type="hidden" name="redirect" value="messages">
-                <input type="hidden" name="id_anno" value="<?= $id_anno_redirect ?>">
-            <?php endif; ?>
-
-            <input type="email" name="email" placeholder="Email" required><br><br>
-            <input type="password" name="mdp" placeholder="Mot de passe" required><br><br>
-
-            <?php if ($erreur !== null): ?>
-                <p class="erreur"><?= htmlspecialchars($erreur) ?></p>
-            <?php endif; ?>
-
-            <input type="submit" value="Se connecter" name="connexion">
-
+        <h1 class="auth-title">Connectez-vous</h1>
+        <?php if ($erreur !== null): ?>
+            <p class="erreur"><?php echo htmlspecialchars($erreur); ?></p>
+        <?php endif; ?>
+        <form action="" method="post" class="auth-form">
+            <div class="form-group">
+                <label for="email">Email :</label><br>
+                <input type="email" name="email" id="email" placeholder="Ex : marcdubois@example.com"
+                       value="<?php echo htmlspecialchars($email); ?>" required>
+            </div><br>
+            <div class="form-group">
+                <label for="mdp">Mot de passe :</label><br>
+                <input type="password" name="mdp" id="mdp" placeholder="Mot de passe" required>
+            </div><br>
+            <div class="honeypot">
+                <input type="text" name="url" tabindex="-1" autocomplete="off">
+            </div>
+            <div class="form-submit">
+                <button type="submit" name="connexion" class="btn-submit">Je me connecte</button></button>
+            </div>
         </form>
-
-        <p class="lien">Pas de compte ? <a href="inscription_blogmoteur.php">S'inscrire</a></p>
+        <p class="lien">Pas de compte ? <a href="inscription_user.php">S'inscrire</a></p>
 
     </div>
 
