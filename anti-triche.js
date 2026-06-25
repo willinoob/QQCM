@@ -24,7 +24,7 @@ function demarrerQcm(idTentative, dureeMinutes) {
 
     antiTriche.actif = true;
     antiTriche.idTentative = idTentative;
-    antiTriche.dureeTotale = dureeMinutes * 60;
+    antiTriche.dureeTotale = dureeMinutes;
     antiTriche.nombreAvertissements = 0;
     antiTriche.alerteEnCours = false;
 

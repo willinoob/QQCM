@@ -50,7 +50,7 @@ if (isset($_POST['connexion'])) {
                     $_SESSION['nom']     = $user['nom'];
                     $_SESSION['role']    = $user['role'];
 
-                    header('Location: acceuil.php');
+                    header('Location: start_quizz_modif.php');
                     exit();
                 }
             } else {
@@ -66,12 +66,14 @@ mysqli_close($connect);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion</title>
     <link rel="stylesheet" href="connexion_css.css">
 </head>
+
 <body class="page-connexion">
 
     <div class="box">
@@ -84,7 +86,7 @@ mysqli_close($connect);
             <div class="form-group">
                 <label for="email">Email :</label><br>
                 <input type="email" name="email" id="email" placeholder="Ex : marcdubois@example.com"
-                       value="<?php echo htmlspecialchars($email); ?>" required>
+                    value="<?php echo htmlspecialchars($email); ?>" required>
             </div><br>
             <div class="form-group">
                 <label for="mdp">Mot de passe :</label><br>
@@ -102,4 +104,5 @@ mysqli_close($connect);
     </div>
 
 </body>
+
 </html>
