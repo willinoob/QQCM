@@ -50,7 +50,7 @@ if (isset($_POST['connexion'])) {
                     $_SESSION['nom']     = $user['nom'];
                     $_SESSION['role']    = $user['role'];
 
-                    header('Location: start_quizz_modif.php');
+                    header('Location: acceuil.php');
                     exit();
                 }
             } else {

@@ -1,32 +1,26 @@
-// ============================================
-// ANTI-TRICHE.JS — Surveillance pendant un QCM
-// ============================================
-
 const antiTriche = {
     actif: false,
+    enPause: false,
     nombreAvertissements: 0,
     maxAvertissements: 3,
     idTentative: null,
     dureeTotale: 0,
+    tempsRestant: 0,
     intervalleTimer: null,
     dernierAvertissementTimestamp: 0,
-    alerteEnCours: false,
 };
 
-// ------------------------------------------------------
-// 1. DÉMARRAGE GÉNÉRAL
-// ------------------------------------------------------
-
-function demarrerQcm(idTentative, dureeMinutes) {
+function demarrerQcm(idTentative, dureeSecondes) {
     if (antiTriche.actif) {
-        return; // un QCM est déjà en cours, on ignore ce nouveau clic
+        return;
     }
 
     antiTriche.actif = true;
+    antiTriche.enPause = false;
     antiTriche.idTentative = idTentative;
-    antiTriche.dureeTotale = dureeMinutes;
+    antiTriche.dureeTotale = dureeSecondes;
+    antiTriche.tempsRestant = dureeSecondes;
     antiTriche.nombreAvertissements = 0;
-    antiTriche.alerteEnCours = false;
 
     demanderPleinEcran();
     demarrerTimer();
@@ -35,10 +29,6 @@ function demarrerQcm(idTentative, dureeMinutes) {
     activerBlocageSelection();
     activerBlocageRaccourcis();
 }
-
-// ------------------------------------------------------
-// 2. PLEIN ÉCRAN OBLIGATOIRE
-// ------------------------------------------------------
 
 function demanderPleinEcran() {
     const element = document.documentElement;
@@ -54,39 +44,32 @@ function demanderPleinEcran() {
 
 document.addEventListener('fullscreenchange', function() {
     if (!antiTriche.actif) return;
+    if (antiTriche.enPause) return;
 
     if (!document.fullscreenElement) {
-        declencherAvertissement("Attention ! Vous avez quitté le mode plein écran.");
+        declencherAvertissement("Vous avez quitté le mode plein écran.");
     }
 });
 
-// ------------------------------------------------------
-// 3. CHANGEMENT D'ONGLET / MINIMISATION
-// ------------------------------------------------------
-
 document.addEventListener('visibilitychange', function() {
     if (!antiTriche.actif) return;
-    if (antiTriche.alerteEnCours) return;
+    if (antiTriche.enPause) return;
 
     if (document.hidden) {
-        declencherAvertissement("Attention ! Vous avez quitté l'onglet du QCM.");
+        declencherAvertissement("Vous avez quitté l'onglet du QCM.");
     }
 });
 
 window.addEventListener('blur', function() {
     if (!antiTriche.actif) return;
-    if (antiTriche.alerteEnCours) return;
+    if (antiTriche.enPause) return;
 
-    declencherAvertissement("Attention ! Vous avez quitté la fenêtre du QCM.");
+    declencherAvertissement("Vous avez quitté la fenêtre du QCM.");
 });
-
-// ------------------------------------------------------
-// 4. GESTION CENTRALISÉE DES AVERTISSEMENTS
-// ------------------------------------------------------
 
 function declencherAvertissement(message) {
     if (!antiTriche.actif) return;
-    if (antiTriche.alerteEnCours) return;
+    if (antiTriche.enPause) return;
 
     const maintenant = Date.now();
     if (maintenant - antiTriche.dernierAvertissementTimestamp < 500) {
@@ -97,25 +80,20 @@ function declencherAvertissement(message) {
     antiTriche.nombreAvertissements++;
 
     if (antiTriche.nombreAvertissements >= antiTriche.maxAvertissements) {
-        annulerTentative();
+        annulerPourTriche();
         return;
     }
 
-    antiTriche.alerteEnCours = true;
+    antiTriche.enPause = true;
+    arreterTimer();
 
-    const texteComplet = message + " (Avertissement " +
-        antiTriche.nombreAvertissements + "/" + antiTriche.maxAvertissements +
-        "). Après " + antiTriche.maxAvertissements + " avertissements, votre tentative sera annulée.";
+    const texte = "Attention ! " + message +
+        " (Avertissement " + antiTriche.nombreAvertissements + "/" + antiTriche.maxAvertissements + ").";
 
-    afficherOverlayAvertissement(texteComplet);
+    afficherOverlay(texte);
 }
 
-// ------------------------------------------------------
-// 5. OVERLAY D'AVERTISSEMENT (remplace alert() pour garder
-//    un vrai geste utilisateur, nécessaire au plein écran)
-// ------------------------------------------------------
-
-function afficherOverlayAvertissement(texte) {
+function afficherOverlay(texte) {
     const overlay = document.getElementById('overlay-avertissement');
     const messageElement = document.getElementById('message-avertissement');
 
@@ -127,60 +105,70 @@ function afficherOverlayAvertissement(texte) {
     }
 }
 
-function reprendreApresAvertissement() {
+function masquerOverlay() {
     const overlay = document.getElementById('overlay-avertissement');
     if (overlay) {
         overlay.style.display = 'none';
     }
-
-    antiTriche.alerteEnCours = false;
-
-    // Ce clic est un vrai geste utilisateur → requestFullscreen() va fonctionner
-    demanderPleinEcran();
 }
 
-// ------------------------------------------------------
-// 6. ANNULATION DE LA TENTATIVE
-// ------------------------------------------------------
+function continuerQcm() {
+    masquerOverlay();
+    antiTriche.enPause = false;
+    demanderPleinEcran();
+    demarrerTimer();
+}
 
-function annulerTentative() {
+function arreterQcm() {
+    masquerOverlay();
     antiTriche.actif = false;
+    arreterTimer();
 
-    if (antiTriche.intervalleTimer) {
-        clearInterval(antiTriche.intervalleTimer);
-    }
-
-    alert("Votre tentative a été annulée suite à plusieurs infractions détectées.");
-
-    envoyerAuServeur('annuler_tentative.php', {
+    envoyerAuServeur('finaliser_tentative.php', {
         id_t: antiTriche.idTentative,
-        raison: 'infractions_multiples'
+        action: 'abandon'
     }, function() {
-        window.location.href = 'resultats.php?id_t=' + antiTriche.idTentative;
+        window.location.href = 'resultat_modif.php';
     });
 }
 
-// ------------------------------------------------------
-// 7. TIMER
-// ------------------------------------------------------
+function annulerPourTriche() {
+    antiTriche.actif = false;
+    arreterTimer();
+
+    alert("Votre tentative a été annulée suite à plusieurs infractions détectées.");
+
+    envoyerAuServeur('finaliser_tentative.php', {
+        id_t: antiTriche.idTentative,
+        action: 'triche'
+    }, function() {
+        window.location.href = 'acceuil.php';
+    });
+}
 
 function demarrerTimer() {
-    let tempsRestant = antiTriche.dureeTotale;
-
-    afficherTemps(tempsRestant);
+    afficherTemps(antiTriche.tempsRestant);
 
     antiTriche.intervalleTimer = setInterval(function() {
-        tempsRestant--;
-        afficherTemps(tempsRestant);
+        antiTriche.tempsRestant--;
+        afficherTemps(antiTriche.tempsRestant);
 
-        if (tempsRestant <= 0) {
-            clearInterval(antiTriche.intervalleTimer);
+        if (antiTriche.tempsRestant <= 0) {
+            arreterTimer();
             soumissionAutomatique();
         }
     }, 1000);
 }
 
+function arreterTimer() {
+    if (antiTriche.intervalleTimer) {
+        clearInterval(antiTriche.intervalleTimer);
+        antiTriche.intervalleTimer = null;
+    }
+}
+
 function afficherTemps(secondes) {
+    if (secondes < 0) secondes = 0;
     const minutes = Math.floor(secondes / 60);
     const sec = secondes % 60;
     const affichage = minutes + ':' + (sec < 10 ? '0' : '') + sec;
@@ -199,10 +187,6 @@ function soumissionAutomatique() {
         formulaire.submit();
     }
 }
-
-// ------------------------------------------------------
-// 8. CLIC DROIT / COPIER-COLLER / SÉLECTION
-// ------------------------------------------------------
 
 function activerBlocageClicDroit() {
     document.addEventListener('contextmenu', function(event) {
@@ -230,10 +214,6 @@ function activerBlocageSelection() {
     });
 }
 
-// ------------------------------------------------------
-// 9. COMMUNICATION AVEC LE SERVEUR
-// ------------------------------------------------------
-
 function envoyerAuServeur(url, donnees, callback) {
     fetch(url, {
         method: 'POST',
@@ -247,13 +227,9 @@ function envoyerAuServeur(url, donnees, callback) {
         if (callback) callback(data);
     })
     .catch(function(erreur) {
-        console.error('Erreur lors de la communication avec le serveur :', erreur);
+        console.error('Erreur de communication avec le serveur :', erreur);
     });
 }
-
-// ------------------------------------------------------
-// 10. BLOCAGE DES RACCOURCIS CLAVIER SENSIBLES
-// ------------------------------------------------------
 
 function activerBlocageRaccourcis() {
     document.addEventListener('keydown', function(event) {

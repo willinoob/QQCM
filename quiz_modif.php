@@ -58,8 +58,9 @@ if ($temps_restant_secondes < 0) {
     <p><?= $i + 1 ?> / 10</p>
 
     <div id="overlay-avertissement" style="display:none;">
-        <p id="message-avertissement"></p>
-        <button onclick="reprendreApresAvertissement()">Reprendre le QCM</button>
+    <p id="message-avertissement"></p>
+    <button onclick="continuerQcm()">Continuer le QCM</button>
+    <button onclick="arreterQcm()">Arrêter le QCM</button>
     </div>
 
     <script src="anti-triche.js"></script>
