@@ -2,13 +2,14 @@
 session_start();
 require "db_modif.php";
 
-if (!isset($_SESSION['questions']) || !isset($_SESSION['id_t']) || !isset($_SESSION['index'])) {
+if (!isset($_SESSION['questions']) || !isset($_SESSION['id_t']) || !isset($_SESSION['id_user'])) {
     header("Location: start_quizz_modif.php");
     exit;
 }
 
 $id_t = (int) $_SESSION['id_t'];
 $id_user = (int) $_SESSION['id_user'];
+$questions = $_SESSION['questions'];
 
 $sql_temps = "SELECT TIMESTAMPDIFF(SECOND, date, NOW()) AS temps_ecoule, etat_tentative
               FROM tentatives WHERE id_t = ? AND id_user = ?";
@@ -23,57 +24,46 @@ if (!$ligne_temps) {
     die("Tentative introuvable ou non autorisée.");
 }
 
-if ($ligne_temps['etat_tentative'] === 'annulée') {
-    session_destroy();
+if ($ligne_temps['etat_tentative'] !== 'en_cours') {
     header("Location: resultat_modif.php");
     exit;
 }
 
 $temps_ecoule = (int) $ligne_temps['temps_ecoule'];
-$duree_maximale = 10 * 60;
 
-if ($temps_ecoule > $duree_maximale) {
-    $score_final = (int) $_SESSION['score'];
+$reponses_user = isset($_POST['reponse']) ? $_POST['reponse'] : [];
 
-    $sql_fin = "UPDATE tentatives
-                SET score = ?, temps_ecoule = ?, etat_tentative = 'terminée'
-                WHERE id_t = ? AND id_user = ?";
-    $stmt_fin = $conn->prepare($sql_fin);
-    $stmt_fin->bind_param("iiii", $score_final, $temps_ecoule, $id_t, $id_user);
-    $stmt_fin->execute();
-    $stmt_fin->close();
+$score = 0;
 
-    header("Location: resultat_modif.php");
-    exit;
+$sql_reponse = "INSERT INTO reponses (reponse_user, id_q, id_t) VALUES (?, ?, ?)";
+$stmt_reponse = $conn->prepare($sql_reponse);
+
+foreach ($questions as $q) {
+    $id_q = (int) $q['id_q'];
+    $bonne_reponse = (int) $q['bonne_reponse'];
+
+    $reponse_donnee = isset($reponses_user[$id_q]) ? (int) $reponses_user[$id_q] : 0;
+
+    if ($reponse_donnee === $bonne_reponse) {
+        $score += 2;
+    }
+
+    $stmt_reponse->bind_param("iii", $reponse_donnee, $id_q, $id_t);
+    $stmt_reponse->execute();
 }
 
-$index = (int) $_SESSION['index'];
-$question = $_SESSION['questions'][$index];
+$stmt_reponse->close();
 
-$reponse_user = isset($_POST['reponse']) ? (int) $_POST['reponse'] : 0;
-$bonne_reponse = (int) $question['bonne_reponse'];
+$sql_fin = "UPDATE tentatives
+            SET score = ?, temps_ecoule = ?, etat_tentative = 'terminée', status = 'valide'
+            WHERE id_t = ? AND id_user = ?";
+$stmt_fin = $conn->prepare($sql_fin);
+$stmt_fin->bind_param("iiii", $score, $temps_ecoule, $id_t, $id_user);
+$stmt_fin->execute();
+$stmt_fin->close();
 
-if ($reponse_user === $bonne_reponse) {
-    $_SESSION['score'] += 2;
-}
+$_SESSION['score'] = $score;
 
-$_SESSION['index']++;
-
-if ($_SESSION['index'] >= 10) {
-    $score_final = (int) $_SESSION['score'];
-
-    $sql_fin = "UPDATE tentatives
-                SET score = ?, temps_ecoule = ?, etat_tentative = 'terminée'
-                WHERE id_t = ? AND id_user = ?";
-    $stmt_fin = $conn->prepare($sql_fin);
-    $stmt_fin->bind_param("iiii", $score_final, $temps_ecoule, $id_t, $id_user);
-    $stmt_fin->execute();
-    $stmt_fin->close();
-
-    header("Location: resultat_modif.php");
-    exit;
-}
-
-header("Location: quiz_modif.php");
+header("Location: resultat_modif.php");
 exit;
 ?>

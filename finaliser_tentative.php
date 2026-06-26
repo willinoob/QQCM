@@ -43,7 +43,8 @@ mysqli_set_charset($connect, 'utf8mb4');
 
 $id_user = (int) $_SESSION['id_user'];
 
-$sql_verif = "SELECT etat_tentative FROM tentatives WHERE id_t = ? AND id_user = ?";
+$sql_verif = "SELECT etat_tentative, TIMESTAMPDIFF(SECOND, date, NOW()) AS temps_ecoule
+              FROM tentatives WHERE id_t = ? AND id_user = ?";
 $stmt_verif = mysqli_prepare($connect, $sql_verif);
 
 if ($stmt_verif === false) {
@@ -72,9 +73,9 @@ if ($tentative['etat_tentative'] !== 'en_cours') {
     exit();
 }
 
-$score_partiel = (int) ($_SESSION['score'] ?? 0);
+$temps_ecoule = (int) $tentative['temps_ecoule'];
 
-$sql_update = "UPDATE tentatives SET score = ?, etat_tentative = ?, status = ? WHERE id_t = ? AND id_user = ?";
+$sql_update = "UPDATE tentatives SET temps_ecoule = ?, etat_tentative = ?, status = ? WHERE id_t = ? AND id_user = ?";
 $stmt_update = mysqli_prepare($connect, $sql_update);
 
 if ($stmt_update === false) {
@@ -84,7 +85,7 @@ if ($stmt_update === false) {
     exit();
 }
 
-mysqli_stmt_bind_param($stmt_update, "issii", $score_partiel, $nouvel_etat, $nouveau_status, $id_t, $id_user);
+mysqli_stmt_bind_param($stmt_update, "issii", $temps_ecoule, $nouvel_etat, $nouveau_status, $id_t, $id_user);
 mysqli_stmt_execute($stmt_update);
 mysqli_stmt_close($stmt_update);
 

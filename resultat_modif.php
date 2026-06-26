@@ -29,7 +29,47 @@ if (!$tentative) {
 
 $score = (int) $tentative['score'];
 $etat = $tentative['etat_tentative'];
-$status = $tentative['status'];
+
+$questions = $_SESSION['questions'] ?? [];
+
+$corrections = [];
+$nombre_bonnes = 0;
+
+if ($etat === 'terminée') {
+
+    $sql_rep = "SELECT id_q, reponse_user FROM reponses WHERE id_t = ?";
+    $stmt_rep = $conn->prepare($sql_rep);
+    $stmt_rep->bind_param("i", $id_t);
+    $stmt_rep->execute();
+    $resultat_rep = $stmt_rep->get_result();
+
+    $reponses_par_question = [];
+    while ($ligne = $resultat_rep->fetch_assoc()) {
+        $reponses_par_question[(int) $ligne['id_q']] = (int) $ligne['reponse_user'];
+    }
+    $stmt_rep->close();
+
+    foreach ($questions as $q) {
+        $id_q = (int) $q['id_q'];
+        $bonne = (int) $q['bonne_reponse'];
+        $donnee = isset($reponses_par_question[$id_q]) ? $reponses_par_question[$id_q] : 0;
+
+        $est_correct = ($donnee === $bonne);
+        if ($est_correct) {
+            $nombre_bonnes++;
+        }
+
+        $texte_donnee = ($donnee >= 1 && $donnee <= 4) ? $q["reponse$donnee"] : "Aucune réponse";
+        $texte_bonne = $q["reponse$bonne"];
+
+        $corrections[] = [
+            'question' => $q['question'],
+            'texte_donnee' => $texte_donnee,
+            'texte_bonne' => $texte_bonne,
+            'est_correct' => $est_correct,
+        ];
+    }
+}
 
 unset($_SESSION['id_t']);
 unset($_SESSION['questions']);
@@ -38,25 +78,43 @@ unset($_SESSION['score']);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Résultat du QCM</title>
+    <style>
+        .correction-bloc {
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+        }
+        .reponse-juste {
+            color: #1a7f37;
+            font-weight: bold;
+        }
+        .reponse-fausse {
+            color: #cf222e;
+            font-weight: bold;
+        }
+        .bonne-reponse {
+            color: #1a7f37;
+        }
+    </style>
 </head>
-
 <body>
 
     <h1>Résultat final</h1>
 
-    <?php if ($etat === 'annulée' || $status === 'invalide'): ?>
+    <?php if ($etat === 'abandonnée'): ?>
 
-        <p>Votre tentative a été <strong>annulée</strong> suite à plusieurs infractions détectées.</p>
-        <p>Aucun score n'est validé pour cette tentative.</p>
+        <p>Vous avez abandonné le QCM.</p>
+        <p>Score : <?= $score ?> / 20</p>
 
-    <?php else: ?>
+    <?php elseif ($etat === 'terminée'): ?>
 
         <p>Score : <?= $score ?> / 20</p>
+        <p>Bonnes réponses : <?= $nombre_bonnes ?> / <?= count($corrections) ?></p>
 
         <?php if ($score >= 16): ?>
             <p>Niveau excellent.</p>
@@ -65,6 +123,21 @@ unset($_SESSION['score']);
         <?php else: ?>
             <p>Niveau faible, il faut retravailler.</p>
         <?php endif; ?>
+
+        <h2>Correction détaillée</h2>
+
+        <?php foreach ($corrections as $c): ?>
+            <div class="correction-bloc">
+                <p><strong><?= htmlspecialchars($c['question']) ?></strong></p>
+
+                <?php if ($c['est_correct']): ?>
+                    <p>Votre réponse : <span class="reponse-juste"><?= htmlspecialchars($c['texte_donnee']) ?></span></p>
+                <?php else: ?>
+                    <p>Votre réponse : <span class="reponse-fausse"><?= htmlspecialchars($c['texte_donnee']) ?></span></p>
+                    <p>Bonne réponse : <span class="bonne-reponse"><?= htmlspecialchars($c['texte_bonne']) ?></span></p>
+                <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
 
     <?php endif; ?>
 
@@ -75,5 +148,4 @@ unset($_SESSION['score']);
     </p>
 
 </body>
-
 </html>

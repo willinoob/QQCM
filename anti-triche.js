@@ -22,6 +22,11 @@ function demarrerQcm(idTentative, dureeSecondes) {
     antiTriche.tempsRestant = dureeSecondes;
     antiTriche.nombreAvertissements = 0;
 
+    const ecranDemarrage = document.getElementById('ecran-demarrage');
+    const ecranQcm = document.getElementById('ecran-qcm');
+    if (ecranDemarrage) ecranDemarrage.style.display = 'none';
+    if (ecranQcm) ecranQcm.style.display = 'block';
+
     demanderPleinEcran();
     demarrerTimer();
     activerBlocageCopierColler();
