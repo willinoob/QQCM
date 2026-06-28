@@ -8,6 +8,7 @@ const antiTriche = {
     tempsRestant: 0,
     intervalleTimer: null,
     dernierAvertissementTimestamp: 0,
+    chronoSortie: null,
 };
 
 function demarrerQcm(idTentative, dureeSecondes) {
@@ -96,6 +97,21 @@ function declencherAvertissement(message) {
         " (Avertissement " + antiTriche.nombreAvertissements + "/" + antiTriche.maxAvertissements + ").";
 
     afficherOverlay(texte);
+
+    demarrerChronoSortie();
+}
+
+function demarrerChronoSortie() {
+    antiTriche.chronoSortie = setTimeout(function() {
+        annulerPourTriche();
+    }, 30000);
+}
+
+function arreterChronoSortie() {
+    if (antiTriche.chronoSortie) {
+        clearTimeout(antiTriche.chronoSortie);
+        antiTriche.chronoSortie = null;
+    }
 }
 
 function afficherOverlay(texte) {
@@ -118,6 +134,7 @@ function masquerOverlay() {
 }
 
 function continuerQcm() {
+    arreterChronoSortie();
     masquerOverlay();
     antiTriche.enPause = false;
     demanderPleinEcran();
@@ -125,6 +142,7 @@ function continuerQcm() {
 }
 
 function arreterQcm() {
+    arreterChronoSortie();
     masquerOverlay();
     antiTriche.actif = false;
     arreterTimer();
@@ -137,7 +155,29 @@ function arreterQcm() {
     });
 }
 
+function terminerQcm() {
+    arreterChronoSortie();
+    if (document.fullscreenElement) {
+        antiTriche.actif = false;
+        arreterTimer();
+        const formulaire = document.getElementById('formulaire-qcm');
+        if (formulaire) {
+            formulaire.submit();
+        }
+    } else {
+        antiTriche.actif = false;
+        arreterTimer();
+        envoyerAuServeur('finaliser_tentative.php', {
+            id_t: antiTriche.idTentative,
+            action: 'triche'
+        }, function() {
+            window.location.href = 'resultat_modif.php';
+        });
+    }
+}
+
 function annulerPourTriche() {
+    arreterChronoSortie();
     antiTriche.actif = false;
     arreterTimer();
 
@@ -193,7 +233,7 @@ function soumissionAutomatique() {
     }
 }
 
-function activerBlocageClicDroit() {
+function activerBlocageClicDroit(){
     document.addEventListener('contextmenu', function(event) {
         if (antiTriche.actif) {
             event.preventDefault();
