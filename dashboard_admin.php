@@ -53,7 +53,7 @@ if ($res && $row = mysqli_fetch_assoc($res)) {
     <nav class="admin-nav" aria-label="Navigation administrateur">
         <a href="admin-users.php" class="btn-action-view">Gerer les utilisateurs</a>
         <a href="admin-questions.php" class="btn-action-view">Gerer les questions</a>
-        <a href="../../deconnexion.php" class="btn-action-ban">Deconnexion</a>
+        <a href="deconnexion.php" class="btn-action-ban">Deconnexion</a>
     </nav>
 </main>
 </body>
