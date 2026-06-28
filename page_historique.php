@@ -67,50 +67,6 @@ if ($onglet == "classement"){
     }
 }
 
-//requete pour les stats
-if ($onglet == "statistiques") {
-
-//les détails par question
-  $id_t = isset($_GET["id_t"]) ? $_GET["id_t"] : 0;
-    $requete_preparée_det = mysqli_prepare( $conn," SELECT q.question,
-                                                    COUNT(*) AS nb_reponses,
-                                                    SUM(CASE WHEN r.reponse_user = q.bonne_reponse THEN 1 ELSE 0 END) AS nb_correctes
-                                                    FROM reponses r
-                                                    JOIN questions q ON r.id_q = q.id_q
-                                                    WHERE r.id_t = ?
-                                                    GROUP BY q.id_q
-                                                    ORDER BY q.id_q ASC"
-    );
-        mysqli_stmt_bind_param($requete_preparée_det, "i", $id_t);
-        mysqli_stmt_execute($requete_preparée_det);
-        $resultat_det = mysqli_stmt_get_result($requete_preparée_det);
-
-    $detail_tent = [];
-    while ($ligne_det = mysqli_fetch_assoc($resultat_det)) {
-        $detail_tent[] = $ligne_det;
-    }
-
- // les questions les plus ratées
-    $requete_preparée_rat = mysqli_prepare($conn," SELECT q.question,
-                                                    COUNT(*) AS nb_reponses,
-                                                    SUM(CASE WHEN r.reponse_user = q.bonne_reponse THEN 1 ELSE 0 END) AS nb_correctes,
-                                                    (SUM(CASE WHEN r.reponse_user = q.bonne_reponse THEN 1 ELSE 0 END) / COUNT(*)) AS taux_reussite
-                                                    FROM reponses r
-                                                    JOIN questions q ON r.id_q = q.id_q
-                                                    WHERE r.id_t = ?
-                                                    GROUP BY q.id_q
-                                                    ORDER BY taux_reussite ASC"
-    );
-    mysqli_stmt_bind_param($requete_preparée_rat, "i", $id_t);
-    mysqli_stmt_execute($requete_preparée_rat);
-    $resultat_rat = mysqli_stmt_get_result($requete_preparée_rat);
-
-    $quest_rat = [];
-    while ($ligne_rat = mysqli_fetch_assoc($resultat_rat)) {
-        $quest_rat[] = $ligne_rat;
-    }
-}
-
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -119,7 +75,7 @@ if ($onglet == "statistiques") {
     <title>Résultats QCM</title>
 
     <!-- Lien vers ton fichier CSS -->
-    <link rel="stylesheet" href="style_historique.css">
+    <link rel="stylesheet" href="page_historique.css">
 </head>
 
 <body>
@@ -131,31 +87,43 @@ if ($onglet == "statistiques") {
         <a href="?onglet=historique">Historique</a>
         <a href="?onglet=moyenne">Moyenne</a>
         <a href="?onglet=classement">Classement</a>
-        <a href="?onglet=statistiques&id_t=1">Statistiques</a>
+    
     </nav>
 
     <hr>
 
     <!-- HISTORIQUE -->
     <?php if ($onglet == "historique") { ?>
-        <h2>Historique des tentatives</h2>
+      <h2>Historique des tentatives de <?= $_SESSION['prenom'] . " " . $_SESSION['nom'] ?></h2>
+
 
         <table>
             <tr>
-                <th>ID Tentative</th>
+                <th>Tentatives</th>
                 <th>Date</th>
                 <th>Score</th>
                 <th>Temps écoulé</th>
             </tr>
 
-            <?php foreach ($historique as $h) { ?>
-                <tr>
-                    <td><?= $h["id_t"] ?></td>
-                    <td><?= $h["date"] ?></td>
-                    <td><?= $h["score"] ?></td>
-                    <td><?= $h["temps_ecoule"] ?> sec</td>
-                </tr>
-            <?php } ?>
+                      
+<?php 
+    // Nombre total de tentatives
+    $numero = count($historique);
+
+    foreach ($historique as $h) { 
+    ?>
+        <tr>
+            <td>Tentative n°<?= $numero ?></td>
+            <td><?= $h["date"] ?></td>
+            <td><?= $h["score"] ?></td>
+            <td><?= $h["temps_ecoule"] ?> sec</td>
+        </tr>
+    <?php 
+        $numero--; // On décrémente
+    } 
+    ?>
+
+
         </table>
     <?php } ?>
 
@@ -192,46 +160,7 @@ if ($onglet == "statistiques") {
     <?php } ?>
 
 
-    <!-- STATISTIQUES -->
-    <?php if ($onglet == "statistiques") { ?>
-        <h2>Statistiques détaillées</h2>
-
-        <h3>Détails par question</h3>
-        <table>
-            <tr>
-                <th>Question</th>
-                <th>Nb réponses</th>
-                <th>Nb correctes</th>
-            </tr>
-
-            <?php foreach ($detail_tent as $d) { ?>
-                <tr>
-                    <td><?= $d["question"] ?></td>
-                    <td><?= $d["nb_reponses"] ?></td>
-                    <td><?= $d["nb_correctes"] ?></td>
-                </tr>
-            <?php } ?>
-        </table>
-
-        <h3>Questions les plus ratées</h3>
-        <table>
-            <tr>
-                <th>Question</th>
-                <th>Nb réponses</th>
-                <th>Nb correctes</th>
-                <th>Taux de réussite</th>
-            </tr>
-
-            <?php foreach ($quest_rat as $r) { ?>
-                <tr>
-                    <td><?= $r["question"] ?></td>
-                    <td><?= $r["nb_reponses"] ?></td>
-                    <td><?= $r["nb_correctes"] ?></td>
-                    <td><?= round($r["taux_reussite"] * 100, 2) ?>%</td>
-                </tr>
-            <?php } ?>
-        </table>
-    <?php } ?>
+   
 
     <p>
         <a href="acceuil.php">Accueil</a>
