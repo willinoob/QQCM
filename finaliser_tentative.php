@@ -32,7 +32,7 @@ if ($action === 'triche') {
     exit();
 }
 
-$connect = mysqli_connect('localhost', 'root', 'root', 'qqcm');
+$connect = mysqli_connect('localhost', 'root', '', 'qqcm');
 if (!$connect) {
     http_response_code(500);
     echo json_encode(['succes' => false, 'message' => 'Erreur de connexion à la base.']);

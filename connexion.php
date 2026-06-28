@@ -4,10 +4,7 @@ session_start();
 $erreur = null;
 $email = '';
 
-$connect = mysqli_connect('localhost', 'root', 'root', 'qqcm');
-if (!$connect) {
-    die("Erreur de connexion : " . mysqli_connect_error());
-}
+require 'db_modif.php';
 
 mysqli_set_charset($connect, 'utf8mb4');
 

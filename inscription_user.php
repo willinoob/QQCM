@@ -2,7 +2,7 @@
 
 session_start();
 $erreurs = [];
-$connect = mysqli_connect('localhost', 'root', 'root', 'qqcm');
+require 'db_modif.php';
 
 if (!$connect) {
     die("Erreur de connexion : " . mysqli_connect_error());
