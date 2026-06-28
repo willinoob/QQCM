@@ -41,5 +41,9 @@ mysqli_close($conn);
         <a href="deconnexion.php">Se déconnecter</a>
     </p>
 
+    <p>
+        <a href="page_historique.php">Voir l'historique des QCM</a>
+    </p>
+
 </body>
 </html>
