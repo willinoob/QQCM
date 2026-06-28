@@ -77,6 +77,7 @@ if ($temps_restant_secondes < 0) {
     </div>
 
     <script src="anti-triche.js"></script>
+    <script src="summer-animations.js"></script>
 
 </body>
 </html>

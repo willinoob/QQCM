@@ -165,5 +165,6 @@ if ($onglet == "classement"){
     <p>
         <a href="acceuil.php">Accueil</a>
     </p>
+    <script src="summer-animations.js"></script>
 </body>
 </html>

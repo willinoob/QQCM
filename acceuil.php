@@ -46,5 +46,6 @@ mysqli_close($conn);
         <a href="page_historique.php">Voir l'historique des QCM</a>
     </p>
 
+    <script src="summer-animations.js"></script>
 </body>
 </html>

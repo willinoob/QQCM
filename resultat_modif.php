@@ -134,5 +134,6 @@ unset($_SESSION['score']);
         <a href="acceuil.php">Retour à l'accueil</a>
     </p>
 
+    <script src="summer-animations.js"></script>
 </body>
 </html>
