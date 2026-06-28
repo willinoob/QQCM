@@ -233,5 +233,8 @@ if ($onglet == "statistiques") {
         </table>
     <?php } ?>
 
+    <p>
+        <a href="acceuil.php">Accueil</a>
+    </p>
 </body>
 </html>
