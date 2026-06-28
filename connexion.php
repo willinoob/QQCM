@@ -4,7 +4,7 @@ session_start();
 $erreur = null;
 $email = '';
 
-$connect = mysqli_connect('localhost', 'root', '', 'qqcm');
+$connect = mysqli_connect('localhost', 'root', 'root', 'qqcm');
 if (!$connect) {
     die("Erreur de connexion : " . mysqli_connect_error());
 }
