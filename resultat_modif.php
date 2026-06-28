@@ -106,7 +106,12 @@ unset($_SESSION['score']);
 
     <h1>Résultat final</h1>
 
-    <?php if ($etat === 'abandonnée'): ?>
+    <?php if ($etat === 'annulée'): ?>
+
+    <p>Votre tentative n'a pas été validée car certaines conditions n'ont pas été respectées.</p>
+    <p>Score : 0 / 20</p>
+
+    <?php elseif ($etat === 'abandonnée'): ?>
 
         <p>Vous avez abandonné le QCM.</p>
         <p>Score : <?= $score ?> / 20</p>

@@ -63,7 +63,7 @@ if ($temps_restant_secondes < 0) {
                 <hr>
             <?php endforeach; ?>
 
-            <button type="submit">Terminer le QCM</button>
+            <button type="button" onclick="terminerQcm()">Terminer le QCM</button>
 
         </form>
 
