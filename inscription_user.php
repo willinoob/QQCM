@@ -4,11 +4,11 @@ session_start();
 $erreurs = [];
 require 'db_modif.php';
 
-if (!$connect) {
+if (!$conn) {
     die("Erreur de connexion : " . mysqli_connect_error());
 }
 
-mysqli_set_charset($connect, 'utf8mb4');
+mysqli_set_charset($conn, 'utf8mb4');
 
 if (isset($_POST['submit'])) {
 
@@ -51,7 +51,7 @@ if (isset($_POST['submit'])) {
     }
 
     if (empty($erreurs)) {
-        $requete_email = mysqli_prepare($connect, "SELECT id_user FROM utilisateurs WHERE email = ?");
+        $requete_email = mysqli_prepare($conn, "SELECT id_user FROM utilisateurs WHERE email = ?");
         mysqli_stmt_bind_param($requete_email, "s", $email);
         mysqli_stmt_execute($requete_email);
         $resultat = mysqli_stmt_get_result($requete_email);
@@ -70,7 +70,7 @@ if (isset($_POST['submit'])) {
         $role_par_defaut = 'user';
         $status_par_defaut = 'actif';
 
-        $requete_insert = mysqli_prepare($connect,
+        $requete_insert = mysqli_prepare($conn,
             "INSERT INTO utilisateurs(nom, prenom, email, mot_de_passe, role, status) VALUES (?, ?, ?, ?, ?, ?)");
         mysqli_stmt_bind_param($requete_insert, "ssssss", $nom, $prenom, $email, $mdp_hache, $role_par_defaut, $status_par_defaut);
         mysqli_stmt_execute($requete_insert);
@@ -80,7 +80,7 @@ if (isset($_POST['submit'])) {
         exit();
     }
 }
-mysqli_close($connect);
+mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>
