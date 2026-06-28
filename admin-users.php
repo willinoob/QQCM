@@ -1,6 +1,5 @@
 <?php
-require_once __DIR__ . '/../shared/admin_check.php';
-require_once __DIR__ . '/../shared/db.php';
+require 'db_modif.php';
 
 $utilisateurs = [];
 $sql = 'SELECT id_user, nom, prenom, email, role, status FROM utilisateurs ORDER BY nom, prenom';
@@ -28,7 +27,7 @@ function is_blocked($status)
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administration - Utilisateurs</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <main class="site-main">

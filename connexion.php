@@ -11,8 +11,7 @@ if (!$connect) {
 
 mysqli_set_charset($connect, 'utf8mb4');
 
-if (isset($_POST['connexion'])) {
-    // --- Vérification du honeypot ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['connexion'])) {
     if (!empty($_POST['url'])) {
         exit();
     }
@@ -23,8 +22,7 @@ if (isset($_POST['connexion'])) {
     if ($email === '' || $mdp === '') {
         $erreur = 'Email ou mot de passe incorrect.';
     } else {
-        // On récupère aussi role et status, nécessaires pour les vérifications après le mot de passe
-        $sql = 'SELECT id_user, nom, prenom, mot_de_passe, role, status FROM utilisateurs WHERE email = ? LIMIT 1';
+        $sql = 'SELECT * FROM utilisateurs WHERE email = ? LIMIT 1';
         $stmt = mysqli_prepare($connect, $sql);
 
         if ($stmt === false) {
@@ -32,19 +30,18 @@ if (isset($_POST['connexion'])) {
         } else {
             mysqli_stmt_bind_param($stmt, 's', $email);
             mysqli_stmt_execute($stmt);
+
             $resultat = mysqli_stmt_get_result($stmt);
             $user = mysqli_fetch_assoc($resultat);
+
             mysqli_stmt_close($stmt);
 
             if ($user && password_verify($mdp, $user['mot_de_passe'])) {
-
-                // Le mot de passe est correct : MAINTENANT on vérifie si le compte est actif.
-                // On ne fait cette vérification qu'après le mot de passe, pour ne jamais révéler
-                // l'état d'un compte à quelqu'un qui n'a même pas le bon mot de passe.
                 if ($user['status'] !== 'actif') {
                     $erreur = 'Votre compte a été bloqué. Contactez un administrateur.';
                 } else {
                     session_regenerate_id(true);
+
                     $_SESSION['id_user'] = (int) $user['id_user'];
                     $_SESSION['prenom']  = $user['prenom'];
                     $_SESSION['nom']     = $user['nom'];
@@ -54,27 +51,16 @@ if (isset($_POST['connexion'])) {
                     exit();
                 }
             } else {
-                // Message volontairement générique : on ne dit jamais
-                // si c'est l'email OU le mot de passe qui est faux
                 $erreur = 'Email ou mot de passe incorrect.';
             }
         }
     }
 }
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-if (!isset($_SESSION['id_user']) && isset($_SESSION['user_id'])) {
-    $_SESSION['id_user'] = (int) $_SESSION['user_id'];
-}
-
-if (!isset($_SESSION['id_user']) || ($_SESSION['role'] ?? '') !== 'admin') {
-    header('Location: ../../connexion.php');
+if (!isset($_SESSION['id_user']) || ($_SESSION['role'] ?? '') === 'admin') {
+    header('Location: dashboard.php');
     exit;
 }
-
 
 mysqli_close($connect);
 ?>

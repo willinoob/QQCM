@@ -1,6 +1,8 @@
 <?php
-require_once __DIR__ . '/../shared/admin_check.php';
-require_once __DIR__ . '/../shared/db.php';
+$conn = mysqli_connect("localhost", "root", "root", "QQCM");
+if (!$conn) {
+    die("Erreur : " . mysqli_connect_error());
+}
 
 $nbUtilisateurs = 0;
 $nbQuestions = 0;
@@ -27,7 +29,7 @@ if ($res && $row = mysqli_fetch_assoc($res)) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin - Projet QCM</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <main class="site-main">

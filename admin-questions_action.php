@@ -1,7 +1,5 @@
 <?php
-require_once __DIR__ . '/../shared/admin_check.php';
-require_once __DIR__ . '/../shared/db.php';
-
+require 'db_modif.php';
 function redirect_questions($type, $message)
 {
     header('Location: admin-questions.php?' . $type . '=' . urlencode($message));

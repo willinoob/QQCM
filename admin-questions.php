@@ -1,7 +1,8 @@
 <?php
-require_once __DIR__ . '/../shared/admin_check.php';
-require_once __DIR__ . '/../shared/db.php';
-
+$conn = mysqli_connect("localhost", "root", "root", "QQCM");
+if (!$conn) {
+    die("Erreur : " . mysqli_connect_error());
+}
 $id_edit = null;
 $question_texte = '';
 $reponse1 = '';
@@ -76,7 +77,7 @@ function e($value)
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administration - Questions</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <main class="site-main">
