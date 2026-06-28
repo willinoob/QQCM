@@ -1,8 +1,5 @@
 <?php
-$conn = mysqli_connect("localhost", "root", "root", "QQCM");
-if (!$conn) {
-    die("Erreur : " . mysqli_connect_error());
-}
+require 'db_modif.php';
 $id_edit = null;
 $question_texte = '';
 $reponse1 = '';
@@ -82,7 +79,7 @@ function e($value)
 <body>
 <main class="site-main">
     <div class="page-actions">
-        <a href="dashboard.php" class="btn-retour">Retour au panneau de controle</a>
+        <a href="dashboard_admin.php" class="btn-retour">Retour au panneau de controle</a>
     </div>
 
     <h1>Gestion des questions</h1>
