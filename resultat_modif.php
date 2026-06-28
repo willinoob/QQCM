@@ -82,25 +82,7 @@ unset($_SESSION['score']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Résultat du QCM</title>
-    <style>
-        .correction-bloc {
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            padding: 12px 16px;
-            margin-bottom: 12px;
-        }
-        .reponse-juste {
-            color: #1a7f37;
-            font-weight: bold;
-        }
-        .reponse-fausse {
-            color: #cf222e;
-            font-weight: bold;
-        }
-        .bonne-reponse {
-            color: #1a7f37;
-        }
-    </style>
+    <link rel="stylesheet" href="resultat.css">
 </head>
 <body>
 
