@@ -1,0 +1,346 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: #f4f6f8;
+    color: #1f2933;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    padding: 28px;
+}
+
+#ecran-demarrage,
+#ecran-qcm {
+    background: #fff;
+    border: 1px solid #d9e2ec;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    margin: 0 auto;
+    max-width: 900px;
+    padding: 28px;
+}
+
+#ecran-demarrage {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: calc(100vh - 56px);
+    text-align: center;
+}
+
+h1 {
+    color: #102a43;
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    margin: 0 0 12px;
+}
+
+#ecran-demarrage p,
+#ecran-qcm > p {
+    color: #52606d;
+    font-size: 1rem;
+    margin: 0 0 22px;
+}
+
+#ecran-qcm > p {
+    background: #e7f5ff;
+    border: 1px solid #bee3f8;
+    border-radius: 6px;
+    color: #1864ab;
+    font-weight: 700;
+    padding: 12px 14px;
+    position: sticky;
+    top: 14px;
+    z-index: 2;
+}
+
+#timer-qcm {
+    color: #102a43;
+}
+
+.question-bloc {
+    background: #fbfcfd;
+    border: 1px solid #d9e2ec;
+    border-radius: 8px;
+    margin-bottom: 18px;
+    padding: 20px;
+}
+
+.question-bloc h3 {
+    color: #243b53;
+    font-size: 1.15rem;
+    line-height: 1.45;
+    margin: 0 0 16px;
+}
+
+.question-bloc label {
+    align-items: flex-start;
+    background: #fff;
+    border: 1px solid #d9e2ec;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    gap: 10px;
+    line-height: 1.4;
+    margin: 8px 0;
+    padding: 11px 12px;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.question-bloc label:hover {
+    background: #f0f4ff;
+    border-color: #9fb3ff;
+}
+
+input[type="radio"] {
+    accent-color: #4a6cf7;
+    flex: 0 0 auto;
+    margin-top: 2px;
+}
+
+hr {
+    border: 0;
+    margin: 0;
+}
+
+button {
+    background: #4a6cf7;
+    border: 0;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+    padding: 12px 18px;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background: #3a56d4;
+    transform: translateY(-1px);
+}
+
+#formulaire-qcm > button {
+    display: block;
+    margin: 24px auto 0;
+    min-width: 220px;
+}
+
+#overlay-avertissement {
+    align-items: center;
+    background: rgba(16, 42, 67, 0.72);
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    left: 0;
+    padding: 24px;
+    position: fixed;
+    right: 0;
+    text-align: center;
+    top: 0;
+    z-index: 10;
+}
+
+#overlay-avertissement p {
+    background: #fff;
+    border-radius: 8px 8px 0 0;
+    color: #102a43;
+    font-size: 1.1rem;
+    margin: 0;
+    max-width: 460px;
+    padding: 24px 24px 12px;
+    width: 100%;
+}
+
+#overlay-avertissement button {
+    border-radius: 0;
+    max-width: 460px;
+    width: 100%;
+}
+
+#overlay-avertissement button:last-child {
+    background: #c92a2a;
+    border-radius: 0 0 8px 8px;
+}
+
+#overlay-avertissement button:last-child:hover {
+    background: #a61e1e;
+}
+
+@media (max-width: 640px) {
+    body {
+        padding: 14px;
+    }
+
+    #ecran-demarrage,
+    #ecran-qcm {
+        padding: 18px;
+    }
+
+    #ecran-demarrage {
+        min-height: calc(100vh - 28px);
+    }
+
+    #formulaire-qcm > button {
+        width: 100%;
+    }
+}
+
+/* Ambiance ete */
+body {
+    background:
+        radial-gradient(circle at 88% 8%, rgba(255, 213, 79, 0.34) 0 78px, transparent 80px),
+        linear-gradient(160deg, #fff8d6 0%, #dff7ff 44%, #fff1d8 100%);
+    isolation: isolate;
+}
+
+#ecran-demarrage,
+#ecran-qcm {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 18px 45px rgba(15, 118, 110, 0.14);
+}
+
+h1 {
+    color: #0f5160;
+}
+
+#ecran-demarrage p,
+#ecran-qcm > p {
+    color: #4f6470;
+}
+
+#ecran-qcm > p {
+    background: #e0f7fa;
+    border-color: rgba(32, 201, 151, 0.3);
+    color: #0f5160;
+}
+
+#timer-qcm {
+    color: #ff6b35;
+}
+
+.question-bloc {
+    background: rgba(255, 255, 255, 0.72);
+    border-color: rgba(32, 201, 151, 0.24);
+}
+
+.question-bloc h3 {
+    color: #155e75;
+}
+
+.question-bloc label:hover {
+    background: #fff8d6;
+    border-color: #ffb86b;
+}
+
+input[type="radio"] {
+    accent-color: #ff8a3d;
+}
+
+button {
+    background: linear-gradient(135deg, #ff9f43, #ff6b6b 52%, #20c997);
+    box-shadow: 0 10px 24px rgba(255, 107, 107, 0.22);
+}
+
+button:hover {
+    background: linear-gradient(135deg, #ff922b, #fa5252 52%, #12b886);
+}
+
+#overlay-avertissement {
+    background: rgba(15, 81, 96, 0.72);
+}
+
+#overlay-avertissement p {
+    color: #0f5160;
+}
+
+.summer-reveal {
+    animation: summerFadeUp 0.75s ease both;
+    animation-delay: var(--summer-delay, 0ms);
+}
+
+.summer-particles {
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    position: fixed;
+    z-index: 0;
+}
+
+body > *:not(.summer-particles) {
+    position: relative;
+    z-index: 1;
+}
+
+.summer-particle {
+    animation: summerFloat var(--duration) linear infinite;
+    animation-delay: var(--delay);
+    background: rgba(255, 183, 77, 0.45);
+    border-radius: 999px;
+    bottom: -40px;
+    height: var(--size);
+    left: var(--x);
+    position: absolute;
+    width: var(--size);
+}
+
+.summer-particle-wave {
+    background: rgba(38, 198, 218, 0.38);
+}
+
+.summer-particle-spark {
+    background: rgba(255, 107, 107, 0.36);
+}
+
+a,
+button {
+    overflow: hidden;
+    position: relative;
+}
+
+a::after,
+button::after {
+    background: radial-gradient(circle at var(--shine-x, 50%) var(--shine-y, 50%), rgba(255, 255, 255, 0.5), transparent 34%);
+    content: "";
+    inset: 0;
+    opacity: 0;
+    position: absolute;
+    transition: opacity 0.2s ease;
+}
+
+a:hover::after,
+button:hover::after {
+    opacity: 1;
+}
+
+@keyframes summerFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes summerFloat {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 0, 0) scale(0.75);
+    }
+
+    18% {
+        opacity: 0.65;
+    }
+
+    to {
+        opacity: 0;
+        transform: translate3d(var(--drift), -110vh, 0) scale(1.2);
+    }
+}
