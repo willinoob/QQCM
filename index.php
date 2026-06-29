@@ -7,17 +7,20 @@
     <link rel="stylesheet" href="landing.css">
 </head>
 <body>
- 
-    <nav>
-        <ul>
-            <li><a href="connexion.php">Connexion</a></li>
-        </ul>
-    </nav>
- 
-    <h1>Bienvenue sur le site de QCM !</h1>
-    <p>Testez vos connaissances à travers des questionnaires de 10 questions, notés sur 20.</p>
-    <p>Pour commencer, veuillez vous connecter.</p>
- 
+    <main class="welcome-page">
+        <section class="welcome-card">
+            <nav class="welcome-nav">
+                <a href="connexion.php" class="btn-primary">Connexion</a>
+            </nav>
+
+            <div class="welcome-content">
+                <p class="welcome-badge">Quiz interactif</p>
+                <h1>Bienvenue sur le site de QCM !</h1>
+                <p class="welcome-text">Testez vos connaissances grâce à des questionnaires de 10 questions, notés sur 20, et suivez vos progrès à chaque session.</p>
+                <p class="welcome-text">Pour commencer, connectez-vous et choisissez vos catégories préférées.</p>
+                <a href="connexion.php" class="btn-cta">Commencer</a>
+            </div>
+        </section>
+    </main>
 </body>
 </html>
- 

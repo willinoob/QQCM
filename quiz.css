@@ -102,6 +102,12 @@ input[type="submit"]:hover {
     background: linear-gradient(135deg, #1d4ed8, #2563eb);
 }
 
+.quiz-categories {
+    font-weight: 600;
+    color: #2563eb;
+    margin-bottom: 12px;
+}
+
 #overlay-avertissement {
     position: fixed;
     inset: 0;

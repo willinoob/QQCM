@@ -82,7 +82,7 @@ function e($value)
 <body>
 <main class="site-main">
     <div class="page-actions">
-        <a href="dashboard.php" class="btn-retour">Retour au panneau de controle</a>
+        <a href="dashboard_admin.php" class="btn-retour">Retour au panneau de controle</a>
     </div>
 
     <h1>Gestion des questions</h1>

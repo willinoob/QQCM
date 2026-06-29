@@ -31,6 +31,7 @@ $score = (int) $tentative['score'];
 $etat = $tentative['etat_tentative'];
 
 $questions = $_SESSION['questions'] ?? [];
+$selected_categories_names = $_SESSION['selected_categories_names'] ?? [];
 
 $corrections = [];
 $nombre_bonnes = 0;
@@ -85,54 +86,61 @@ unset($_SESSION['score']);
     <link rel="stylesheet" href="resultat.css">
 </head>
 <body>
+    <main class="resultat-page">
+        <section class="resultat-card">
+            <h1>Résultat final</h1>
 
-    <h1>Résultat final</h1>
+            <?php if (!empty($selected_categories_names)): ?>
+                <p class="resultat-categories">Catégories choisies : <?= htmlspecialchars(implode(', ', $selected_categories_names)) ?></p>
+            <?php endif; ?>
 
-    <?php if ($etat === 'annulée'): ?>
+            <?php if ($etat === 'annulée'): ?>
 
-    <p>Votre tentative n'a pas été validée car certaines conditions n'ont pas été respectées.</p>
-    <p>Score : 0 / 20</p>
+            <p class="resultat-message">Votre tentative n'a pas été validée car certaines conditions n'ont pas été respectées.</p>
+            <p class="resultat-score">Score : 0 / 20</p>
 
-    <?php elseif ($etat === 'abandonnée'): ?>
+            <?php elseif ($etat === 'abandonnée'): ?>
 
-        <p>Vous avez abandonné le QCM.</p>
-        <p>Score : <?= $score ?> / 20</p>
+                <p class="resultat-message">Vous avez abandonné le QCM.</p>
+                <p class="resultat-score">Score : <?= $score ?> / 20</p>
 
-    <?php elseif ($etat === 'terminée'): ?>
+            <?php elseif ($etat === 'terminée'): ?>
 
-        <p>Score : <?= $score ?> / 20</p>
-        <p>Bonnes réponses : <?= $nombre_bonnes ?> / <?= count($corrections) ?></p>
+                <p class="resultat-score">Score : <?= $score ?> / 20</p>
+                <p class="resultat-score secondaire">Bonnes réponses : <?= $nombre_bonnes ?> / <?= count($corrections) ?></p>
 
-        <?php if ($score >= 16): ?>
-            <p>Niveau excellent.</p>
-        <?php elseif ($score >= 10): ?>
-            <p>Niveau moyen.</p>
-        <?php else: ?>
-            <p>Niveau faible, il faut retravailler.</p>
-        <?php endif; ?>
-
-        <h2>Correction détaillée</h2>
-
-        <?php foreach ($corrections as $c): ?>
-            <div class="correction-bloc">
-                <p><strong><?= htmlspecialchars($c['question']) ?></strong></p>
-
-                <?php if ($c['est_correct']): ?>
-                    <p>Votre réponse : <span class="reponse-juste"><?= htmlspecialchars($c['texte_donnee']) ?></span></p>
+                <?php if ($score >= 16): ?>
+                    <p class="niveau excellent">Niveau excellent.</p>
+                <?php elseif ($score >= 10): ?>
+                    <p class="niveau moyen">Niveau moyen.</p>
                 <?php else: ?>
-                    <p>Votre réponse : <span class="reponse-fausse"><?= htmlspecialchars($c['texte_donnee']) ?></span></p>
-                    <p>Bonne réponse : <span class="bonne-reponse"><?= htmlspecialchars($c['texte_bonne']) ?></span></p>
+                    <p class="niveau faible">Niveau faible, il faut retravailler.</p>
                 <?php endif; ?>
+
+                <h2>Correction détaillée</h2>
+
+                <div class="correction-list">
+                    <?php foreach ($corrections as $c): ?>
+                        <div class="correction-bloc <?= $c['est_correct'] ? 'correct' : 'incorrect' ?>">
+                            <p><strong><?= htmlspecialchars($c['question']) ?></strong></p>
+
+                            <?php if ($c['est_correct']): ?>
+                                <p>Votre réponse : <span class="reponse-juste"><?= htmlspecialchars($c['texte_donnee']) ?></span></p>
+                            <?php else: ?>
+                                <p>Votre réponse : <span class="reponse-fausse"><?= htmlspecialchars($c['texte_donnee']) ?></span></p>
+                                <p>Bonne réponse : <span class="bonne-reponse"><?= htmlspecialchars($c['texte_bonne']) ?></span></p>
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+
+            <?php endif; ?>
+
+            <div class="actions">
+                <a href="start_quizz_modif.php">Refaire un QCM</a>
+                <a href="home.php" class="secondary">Retour à l'accueil</a>
             </div>
-        <?php endforeach; ?>
-
-    <?php endif; ?>
-
-    <p>
-        <a href="start_quizz_modif.php">Refaire un QCM</a>
-        |
-        <a href="acceuil.php">Retour à l'accueil</a>
-    </p>
-
+        </section>
+    </main>
 </body>
 </html>

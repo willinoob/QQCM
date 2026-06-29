@@ -9,7 +9,7 @@ if (!isset($_SESSION['questions']) || !isset($_SESSION['id_t']) || !isset($_SESS
 $id_t = (int) $_SESSION['id_t'];
 $id_user = (int) $_SESSION['id_user'];
 $questions = $_SESSION['questions'];
-
+$selected_categories_names = $_SESSION['selected_categories_names'] ?? [];
 
 $sql_temps = "SELECT TIMESTAMPDIFF(SECOND, date, NOW()) AS temps_ecoule
               FROM tentatives WHERE id_t = ? AND id_user = ?";
@@ -45,6 +45,10 @@ if ($temps_restant_secondes < 0) {
     </div>
 
     <div id="ecran-qcm" style="display:none;">
+
+        <?php if (!empty($selected_categories_names)): ?>
+            <p class="quiz-categories">Catégories sélectionnées : <?= htmlspecialchars(implode(', ', $selected_categories_names)) ?></p>
+        <?php endif; ?>
 
         <p>Temps restant : <span id="timer-qcm">--:--</span></p>
 

@@ -21,7 +21,6 @@ if ($id_user <= 0) {
 
 if ($id_user === $current_user_id) {
     redirect_users('erreur', 'Vous ne pouvez pas modifier votre propre compte depuis cet espace.');
-}
 
 if ($action === 'supprimer') {
     $stmt = mysqli_prepare($conn, 'DELETE FROM utilisateurs WHERE id_user = ?');
