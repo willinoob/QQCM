@@ -75,7 +75,7 @@ if ($onglet == "classement"){
     <title>Résultats QCM</title>
 
     <!-- Lien vers ton fichier CSS -->
-    <link rel="stylesheet" href="page_historique.css">
+    <link rel="stylesheet" href="historique.css">
 </head>
 
 <body>

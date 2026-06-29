@@ -1,5 +1,6 @@
 <?php
 session_start();
+require 'db_modif.php';
 
 header('Content-Type: application/json');
 
@@ -32,25 +33,18 @@ if ($action === 'triche') {
     exit();
 }
 
-$connect = mysqli_connect('localhost', 'root', '', 'qqcm');
-if (!$connect) {
-    http_response_code(500);
-    echo json_encode(['succes' => false, 'message' => 'Erreur de connexion à la base.']);
-    exit();
-}
-
-mysqli_set_charset($connect, 'utf8mb4');
+mysqli_set_charset($conn, 'utf8mb4');
 
 $id_user = (int) $_SESSION['id_user'];
 
 $sql_verif = "SELECT etat_tentative, TIMESTAMPDIFF(SECOND, date, NOW()) AS temps_ecoule
               FROM tentatives WHERE id_t = ? AND id_user = ?";
-$stmt_verif = mysqli_prepare($connect, $sql_verif);
+$stmt_verif = mysqli_prepare($conn, $sql_verif);
 
 if ($stmt_verif === false) {
     http_response_code(500);
     echo json_encode(['succes' => false, 'message' => 'Erreur technique lors de la vérification.']);
-    mysqli_close($connect);
+    mysqli_close($conn);
     exit();
 }
 
@@ -63,25 +57,25 @@ mysqli_stmt_close($stmt_verif);
 if (!$tentative) {
     http_response_code(403);
     echo json_encode(['succes' => false, 'message' => 'Tentative introuvable ou non autorisée.']);
-    mysqli_close($connect);
+    mysqli_close($conn);
     exit();
 }
 
 if ($tentative['etat_tentative'] !== 'en_cours') {
     echo json_encode(['succes' => true, 'message' => 'Tentative déjà finalisée.']);
-    mysqli_close($connect);
+    mysqli_close($conn);
     exit();
 }
 
 $temps_ecoule = (int) $tentative['temps_ecoule'];
 
 $sql_update = "UPDATE tentatives SET temps_ecoule = ?, etat_tentative = ?, status = ? WHERE id_t = ? AND id_user = ?";
-$stmt_update = mysqli_prepare($connect, $sql_update);
+$stmt_update = mysqli_prepare($conn, $sql_update);
 
 if ($stmt_update === false) {
     http_response_code(500);
     echo json_encode(['succes' => false, 'message' => 'Erreur technique lors de la mise à jour.']);
-    mysqli_close($connect);
+    mysqli_close($conn);
     exit();
 }
 
@@ -89,7 +83,7 @@ mysqli_stmt_bind_param($stmt_update, "issii", $temps_ecoule, $nouvel_etat, $nouv
 mysqli_stmt_execute($stmt_update);
 mysqli_stmt_close($stmt_update);
 
-mysqli_close($connect);
+mysqli_close($conn);
 
 echo json_encode(['succes' => true, 'message' => 'Tentative finalisée.']);
 exit();

@@ -26,7 +26,7 @@ if ($res && $row = mysqli_fetch_assoc($res)) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin - Projet QCM</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="admin.css">
 </head>
 <body>
 <main class="site-main">

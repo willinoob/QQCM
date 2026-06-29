@@ -152,6 +152,8 @@ function arreterQcm() {
         action: 'abandon'
     }, function() {
         window.location.href = 'resultat_modif.php';
+    }, function() {
+        window.location.href = 'resultat_modif.php';
     });
 }
 
@@ -259,7 +261,7 @@ function activerBlocageSelection() {
     });
 }
 
-function envoyerAuServeur(url, donnees, callback) {
+function envoyerAuServeur(url, donnees, callback, erreurCallback) {
     fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -273,6 +275,9 @@ function envoyerAuServeur(url, donnees, callback) {
     })
     .catch(function(erreur) {
         console.error('Erreur de communication avec le serveur :', erreur);
+        if (erreurCallback) {
+            erreurCallback(erreur);
+        }
     });
 }
 
